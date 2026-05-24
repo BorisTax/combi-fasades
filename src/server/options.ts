@@ -7,7 +7,6 @@ import { fileURLToPath } from 'url'
 import PermissionServiceSQLite from './services/permissionServiceSQLite.js'
 import DataBaseServiceSQLite from './services/dataBaseServiceSQLite.js'
 import { Template } from '../types/templates.js'
-import SettingsServiceSQLite from './services/settingsServiceSQLite.js'
 
 export const JWT_SECRET = "secretkey"
 const __filename = fileURLToPath(import.meta.url);
@@ -38,8 +37,8 @@ export function getDataBaseService<T>() {
 export function getDataBaseTemplateService() {
   return new DataBaseServiceSQLite<Template>(templatePath)
 }
-export function getSettingsService() {
-  return new SettingsServiceSQLite(settingsPath)
+export function getSettingsService<T>() {
+  return new DataBaseServiceSQLite<T>(settingsPath)
 }
 
 export function getPermissionService(){
@@ -47,7 +46,8 @@ export function getPermissionService(){
 }
 export const userRoleParser = async (req: Request, res: Response, next: NextFunction) => {
   let token = req.cookies.token as string
-  (req as MyRequest).token = token
+  (req as MyRequest).token = token;
+  (req as MyRequest).apiKey = req.query.apiKey as string
   const tokenData = await getTokenData(token)
   const user = await getUserByToken(token)
   if (user) {

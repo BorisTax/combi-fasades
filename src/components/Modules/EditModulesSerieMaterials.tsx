@@ -19,28 +19,30 @@ import { loadModuleMatBases, loadModuleMaterials } from "../../atoms/modules/mat
 
 export default function EditModulesSerieMaterials() {
     const { permissions } = useAtomValue(userAtom)
-    const perm = permissions.get(RESOURCE.MODULES)
+    const perm = permissions.get(RESOURCE.MODULEPROJECT)
     const [modules, setModules] = useState<ExtMap<ModuleModulesTableSchema>>(new Map())
+    const sortedModules = [...modules.keys()].toSorted((id1, id2) => (modules.get(id1)?.name || "") > (modules.get(id2)?.name || "") ? 1 : -1)
     const [groups, setGroups] = useState(new Map())
     const [series, setSeries] = useState(new Map())
     const [matBases, setMatBases] = useState<ExtMap<ModuleMatBaseTableSchema>>(new Map()) 
     const [selectedMatBaseId, setSelectedMatBaseId] = useState(0)
     const [materials, setMaterials] = useState<ExtMap<ModuleMaterialsTableSchema>>(new Map())
-    const materialList = [...materials.keys()].filter(id => materials.get(id)?.baseId === selectedMatBaseId || selectedMatBaseId === 0)
     const { getFullMaterialName } = useModuleMaterials(materials)
+    const materialList = [...materials.keys()].filter(id => materials.get(id)?.baseId === selectedMatBaseId || selectedMatBaseId === 0)
+    const sortedMaterialList = materialList.toSorted((id1, id2) => getFullMaterialName(id1) > getFullMaterialName(id2) ? 1 : -1)
     const [serieMaterials, setSerieMaterials] = useState<ExtMap<ModuleSerieMaterialsTableSchema>>(new Map())
     const [selectedGroupId, setSelectedGroupId] = useState(0)
     const seriesList = [...series.keys()].filter(id => id !== 0)
     const [selectedSerieId, setSelectedSerieId] = useState(0)
     const [selectedSerieMaterialId, setSelectedSerieMaterialId] = useState(0)
     const { moduleId, matIndex, materialId } = serieMaterials.get(selectedSerieMaterialId) || { moduleId: 0, matIndex: 0, materialId: 0 }
-    const heads = [{ caption: 'id', sorted: true }, { caption: 'Серия' }, { caption: 'Модуль' }, { caption: 'Индекс мат.' }, { caption: 'Материал' }]
+    const heads = [{ caption: 'id', sorted: true }, { caption: 'Серия', sorted: true }, { caption: 'Модуль', sorted: true }, { caption: 'Индекс мат.' }, { caption: 'Материал' }]
     const contents: TableDataRow[] = []
     serieMaterials.forEach((schema, id) => contents.push({ key: id, data: [id, series.get(schema.serieId)?.name, modules.get(schema.moduleId)?.name, schema.matIndex, getFullMaterialName(schema.materialId)] }))
     const editItems: EditDataItem[] = [
-        { title: "Модуль", value: moduleId, displayValue: (value) => modules.get(value as number)?.name || "", inputType: InputType.LIST, list: [0,...modules.keys()], checkValue: () => ({ success: true, message: "" }) },
+        { title: "Модуль", value: moduleId, displayValue: (value) => modules.get(value as number)?.name || "", inputType: InputType.LIST, list: [0,...sortedModules], checkValue: () => ({ success: true, message: "" }) },
         { title: "Индекс мат.", value: matIndex, displayValue: value => (value || "").toString(), inputType: InputType.LIST, list: MatIndexes, checkValue: (value) => ({ success: (value as number) > 0, message: "Введите индекс материала" }) },
-        { title: "Материал:", value: materialId, displayValue: value => getFullMaterialName(value as number), inputType: InputType.LIST, list: materialList, checkValue: (value) => ({ success: (value as number) > 0, message: "Выберите материал" }) },
+        { title: "Материал:", value: materialId, displayValue: value => getFullMaterialName(value as number), inputType: InputType.LIST, list: sortedMaterialList, checkValue: (value) => ({ success: (value as number) > 0, message: "Выберите материал" }) },
     ]
     const loadData = (serieId: number) => { loadModuleSerieMaterials(serieId).then(data => { setSerieMaterials(() => data); setSelectedSerieMaterialId(() => [...data.keys()][0] || 0) }) }
     useEffect(() => {

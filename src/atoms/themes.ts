@@ -1,5 +1,5 @@
 import { atom, useAtomValue } from "jotai";
-import { SettingsThemeSchema, THEME_STANDART } from "../types/themes";
+import { SettingsThemeSchema, THEME_STANDART } from "../types/settings";
 import { userAtom } from "./users";
 import { RESOURCE } from "../types/user";
 import { fetchData, fetchGetData, FetchResult } from "../functions/fetch";

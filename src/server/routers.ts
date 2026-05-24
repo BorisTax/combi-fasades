@@ -20,7 +20,7 @@ import moduleMaterialCorrespondRouter from './routers/modules/materialsCorrespon
 import edgeGrooveCommentRouter from './routers/modules/edgesGroovesComments.js'
 
 import { StatusCodes } from "http-status-codes";
-import { USERS_ROUTE, PERMISSIONS_ROUTE, MATERIALS_ROUTE, TEMPLATES_ROUTE, SPECIFICATION_ROUTE, DATABASE_ROUTE, WARDROBE_ROUTE, VERSION_ROUTE, SKLAD_ROUTE, SETTINGS_ROUTE, MODULE_ROUTE, RESOURCES_ROUTE }  from '../types/routes';
+import { USERS_ROUTE, PERMISSIONS_ROUTE, MATERIALS_ROUTE, TEMPLATES_ROUTE, SPECIFICATION_ROUTE, DATABASE_ROUTE, WARDROBE_ROUTE, VERSION_ROUTE, SKLAD_ROUTE, SETTINGS_ROUTE, MODULEPROJ_ROUTE, RESOURCES_ROUTE }  from '../types/routes';
 export const router = express.Router();
 
 router.use(USERS_ROUTE, userRouter)
@@ -33,7 +33,7 @@ router.use(DATABASE_ROUTE, databaseRouter)
 router.use(WARDROBE_ROUTE, wardrobeRouter)
 router.use(SETTINGS_ROUTE, settingsRouter)
 router.use(SKLAD_ROUTE, skladStolRouter, skladMatRouter)
-router.use(MODULE_ROUTE, moduleGroupsRouter, modulesRouter, moduleDetailsRouter, moduleMaterialsRouter,moduleMaterialCorrespondRouter, moduleSerieMaterialsRouter, edgeGrooveCommentRouter)
+router.use(MODULEPROJ_ROUTE, moduleGroupsRouter, modulesRouter, moduleDetailsRouter, moduleMaterialsRouter,moduleMaterialCorrespondRouter, moduleSerieMaterialsRouter, edgeGrooveCommentRouter)
 router.get(VERSION_ROUTE, (req, res) => {
     res.status(StatusCodes.OK).json({ success: true, data: [process.env.VERSION] })
 })

@@ -26,7 +26,7 @@ export type ModuleMatBaseTableSchema = {
 }
 export type ModuleGroupsTableSchema = DefaultSchema
 
-export type ModuleEdgesTableSchema = DefaultSchema & { thickness: number }
+export type ModuleEdgesTableSchema = DefaultSchema & { thickness: number, code1c: string }
 
 export type ModuleGroovesTableSchema = DefaultSchema
 
@@ -80,6 +80,7 @@ export type ModuleDetailsTableSchema = {
     ew1: number
     ew2: number
     texture: number
+    drill: number
 }
 
 
@@ -94,8 +95,7 @@ export type ModuleMaterialsTableSchema = {
 
 
 export type ModuleFilmTableSchema = {
-    id: number
-    materialId: number
+    matId: number
     glossy: number
 }
 

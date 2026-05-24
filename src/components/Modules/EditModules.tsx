@@ -14,7 +14,7 @@ import PropertyGrid from "../inputs/PropertyGrid"
 
 export default function EditModules() {
     const { permissions } = useAtomValue(userAtom)
-    const perm = permissions.get(RESOURCE.MODULES)
+    const perm = permissions.get(RESOURCE.MODULEPROJECT)
     const setLastState = useSetAtom(modulesLastStateDBAtom)
     const lastState = useAtomValue(modulesLastStateDBAtom)
     const [modules, setModules] = useState(new Map())

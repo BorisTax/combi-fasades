@@ -4,8 +4,8 @@ services:
     build: .
     restart: always
     environment:
-      - VERSION=2.6.3
-    image: boristax/wardrobes:v2.6.3
+      - VERSION=2.6.5
+    image: boristax/wardrobes:v2.6.5
     ports:
       - "5555:5555"
     command: npm run start
@@ -14,6 +14,7 @@ services:
       - sklad-db:/app/src/server/database/sklad
       - users-db:/app/src/server/database/users
       - settings-db:/app/src/server/database/settings
+      - module-db:/app/src/server/database/module
 volumes:
   users-db:
       external: true
@@ -22,4 +23,6 @@ volumes:
   sklad-db:
       external: true
   settings-db:
+      external: true
+  module-db:
       external: true

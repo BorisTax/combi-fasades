@@ -13,7 +13,7 @@ import ComboBox from "../inputs/ComboBox"
 
 export default function EditModuleSeries() {
     const { permissions } = useAtomValue(userAtom)
-    const perm = permissions.get(RESOURCE.MODULES)
+    const perm = permissions.get(RESOURCE.MODULEPROJECT)
     const [groups, setGroups] = useState(new Map())
     const [selectedGroupId, setSelectedGroupId] = useState(0)
     const [series, setSeries] = useState(new Map())

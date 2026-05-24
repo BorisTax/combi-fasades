@@ -17,8 +17,9 @@ import { ModuleModulesTableSchema } from "../../types/schemas/moduleSchemas"
 
 export default function EditModulesCorrespond() {
     const { permissions } = useAtomValue(userAtom)
-    const perm = permissions.get(RESOURCE.MODULES)
+    const perm = permissions.get(RESOURCE.MODULEPROJECT)
     const [modules, setModules] = useState<ExtMap<ModuleModulesTableSchema>>(new Map())
+    const sortedModules = [...modules.keys()].toSorted((id1, id2) => (modules.get(id1)?.name || "") > (modules.get(id2)?.name || "") ? 1 : -1)
     const [groups, setGroups] = useState(new Map())
     const [series, setSeries] = useState(new Map())
     const [modulesCorr, setModulesCorr] = useState(new Map())
@@ -32,9 +33,9 @@ export default function EditModulesCorrespond() {
     const contents: TableDataRow[] = []
     modulesCorrList.forEach((key) => contents.push({ key, data: [key, modules.get(modulesCorr.get(key)?.moduleId || 0)?.name, modulesCorr.get(key)?.name1C, modulesCorr.get(key)?.code1C, modulesCorr.get(key)?.orderName] }))
     const editItems: EditDataItem[] = [
-        { title: "Модуль", value: moduleId, displayValue: (value) => value === 0 ? "" : modules.get(value as number)?.name || "", inputType: InputType.LIST, list: [0, ...modules.keys()], checkValue: (value) => ({ success: !!modules.get(value as number), message: "Выберите модуль" }) },
-        { title: "Наименование 1С:", value: name1C, inputType: InputType.TEXT, checkValue: (value) => ({ success: (value as string).trim() !== "", message: "Введите наименование 1С" }) },
-        { title: "Код 1С:", value: code1C, inputType: InputType.TEXT, propertyType: PropertyType.INTEGER_POSITIVE_NUMBER, optional: true},
+        { title: "Модуль", value: moduleId, displayValue: (value) => value === 0 ? "" : modules.get(value as number)?.name || "", inputType: InputType.LIST, list: [0, ...sortedModules], checkValue: (value) => ({ success: !!modules.get(value as number), message: "Выберите модуль" }) },
+        { title: "Наименование 1С:", value: name1C, inputType: InputType.TEXT, checkValue: (value) => ({ success: (value as string).trim() !== "", message: "Введите наименование 1С" }), styles:{minWidth: "500px"}  },
+        { title: "Код 1С:", value: code1C, inputType: InputType.TEXT, propertyType: PropertyType.INTEGER_POSITIVE_NUMBER, maxLength: 9, optional: true},
         { title: "Заказ:", value: orderName, inputType: InputType.TEXT, optional: true},
     ]
     const loadData = (serieId: number) => { loadModulesCorrespond(serieId).then(data => { setModulesCorr(() => data); setSelectedModuleCorrId(() => [...data.keys()][0] || 0) }) }

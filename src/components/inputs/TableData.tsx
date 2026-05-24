@@ -43,7 +43,7 @@ export default function TableData({ header, content, styles = {}, rowNumbers = t
         </tr>})
     useEffect(() => {
         setSortedColumn(header.findLastIndex(h => h.sorted && h.defaultSorted))
-    }, [header])
+    }, [])
     return <div className="table-data" style={{ ...styles }}>
         <table>
             <thead>

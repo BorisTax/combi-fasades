@@ -13,18 +13,19 @@ import ComboBox from "../inputs/ComboBox"
 
 export default function EditModuleMaterials() {
     const { permissions } = useAtomValue(userAtom)
-    const perm = permissions.get(RESOURCE.MODULES)
+    const perm = permissions.get(RESOURCE.MODULEPROJECT)
     const [matBases, setMatBases] = useState<ExtMap<ModuleMatBaseTableSchema>>(new Map())
     const [matColors, setMatColors] = useState<ExtMap<ModuleColorsTableSchema>>(new Map())
+    const matColorsSorted = [...matColors.keys()].toSorted((id1, id2) => (matColors.get(id1)?.name || "") > (matColors.get(id2)?.name || "") ? 1 : -1)
     const [selectedMatBaseId, setSelectedMatBaseId] = useState(0)
     const [data, setData] = useState<ExtMap<ModuleMaterialsTableSchema>>(new Map())
     const dataList = [...data.keys()].filter(id => (data.get(id)?.baseId === selectedMatBaseId || selectedMatBaseId === 0) && id !== 0)
     const [selectedId, setSelectedId] = useState(0)
-    const heads = [{ caption: 'id' }, { caption: 'Основа' }, { caption: 'Цвет' }, { caption: 'Длина' }, { caption: 'Ширина' }, { caption: 'Краткое наименование' }]
+    const heads = [{ caption: 'id', sorted: true }, { caption: 'Основа', sorted: true }, { caption: 'Цвет', sorted: true }, { caption: 'Длина' }, { caption: 'Ширина' }, { caption: 'Краткое наименование' }]
     const contents: TableDataRow[] = dataList.map(id => ({ key: id, data: [id, matBases.get(data.get(id)?.baseId || 0)?.name, matColors.get(data.get(id)?.colorId || 0)?.name, data.get(id)?.length, data.get(id)?.width, data.get(id)?.shortName] }))
     const editItems: EditDataItem[] = [
         { title: "Основа:", value: data.get(selectedId)?.baseId || 0, displayValue: value => matBases.get(value as number)?.name || "", inputType: InputType.LIST, list: [...matBases.keys()], checkValue: (value) => ({ success: (value as number) !== 0, message: "Выберите основу" }) },
-        { title: "Цвет:", value: data.get(selectedId)?.colorId || 0, displayValue: value => matColors.get(value as number)?.name || "", inputType: InputType.LIST, list: [...matColors.keys()], checkValue: (value) => ({ success: (value as number) !== 0, message: "Выберите цвет" }) },
+        { title: "Цвет:", value: data.get(selectedId)?.colorId || 0, displayValue: value => matColors.get(value as number)?.name || "", inputType: InputType.LIST, list: matColorsSorted, checkValue: (value) => ({ success: (value as number) !== 0, message: "Выберите цвет" }) },
         { title: "Длина:", value: data.get(selectedId)?.length || "", inputType: InputType.TEXT, propertyType: PropertyType.INTEGER_POSITIVE_NUMBER, checkValue: (value) => ({ success: (value as number) > 0, message: "Введите длину" }) },
         { title: "Ширина:", value: data.get(selectedId)?.width || "", inputType: InputType.TEXT, propertyType: PropertyType.INTEGER_POSITIVE_NUMBER, checkValue: (value) => ({ success: (value as number) > 0, message: "Введите ширину" }) },
         { title: "Краткое наименование:", value: data.get(selectedId)?.shortName || "", inputType: InputType.TEXT, checkValue: (value) => ({ success: (value as string).trim() !== "", message: "Введите краткое наименование" }) },

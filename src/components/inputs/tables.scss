@@ -73,7 +73,7 @@
 .table-grid {
   display: grid;
   align-items: center;
-  grid-template-columns: auto auto;
+  grid-template-columns: max-content auto;
   gap: 0.2rem;
   background-color: $defaultBackColor;
 
@@ -82,7 +82,7 @@
 .edit-section-grid {
   display: grid;
   align-items: center;
-  grid-template-columns: auto auto;
+  grid-template-columns: max-content auto;
   gap: 0.2rem;
   -background-color: $defaultBackColor;
 }

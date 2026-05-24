@@ -13,15 +13,16 @@ import { ModuleEdgesTableSchema } from "../../types/schemas/moduleSchemas"
 
 export default function EditModuleEdges() {
     const { permissions } = useAtomValue(userAtom)
-    const perm = permissions.get(RESOURCE.MODULES)
+    const perm = permissions.get(RESOURCE.MODULEPROJECT)
     const [edges, setEdges] = useState<ExtMap<ModuleEdgesTableSchema>>(new Map())
     const edgesList = [...edges.keys()].filter(id => id !== 0)
     const [selectedId, setSelectedId] = useState(0)
-    const heads = [{ caption: 'id' }, { caption: 'Наименование' }, { caption: 'Толщина' }]
-    const contents: TableDataRow[] = edgesList.map(id => ({ key: id, data: [id, edges.get(id)?.name, edges.get(id)?.thickness] }))
+    const heads = [{ caption: 'id' }, { caption: 'Наименование' }, { caption: 'Толщина' }, { caption: 'Код' }]
+    const contents: TableDataRow[] = edgesList.map(id => ({ key: id, data: [id, edges.get(id)?.name, edges.get(id)?.thickness, edges.get(id)?.code1c] }))
     const editItems: EditDataItem[] = [
         { title: "Наименование:", value: edges.get(selectedId)?.name || "", inputType: InputType.TEXT, checkValue: (value) => ({ success: value !== "", message: "Введите наименование" }) },
         { title: "Толщина:", value: edges.get(selectedId)?.thickness || "", inputType: InputType.TEXT, propertyType: PropertyType.POSITIVE_NUMBER, checkValue: (value) => ({ success: value !== "", message: "Введите толщину" }) },
+        { title: "Толщина:", value: edges.get(selectedId)?.code1c || "", inputType: InputType.TEXT, propertyType: PropertyType.POSITIVE_NUMBER, checkValue: (value) => ({ success: value !== "", message: "Введите код" }) },
     ]
     const loadData = () => loadModulesEdges().then(data => { setEdges(() => data); setSelectedId(() => [...data.keys()][0] || 0) })
     useEffect(() => {
@@ -34,11 +35,12 @@ export default function EditModuleEdges() {
         {(perm?.Read) ? <EditDataSection items={editItems}
             onUpdate={perm?.Update ? {
                 disabled: !edges.has(selectedId),
-                question: (values) => `Обновить кромку:\nid=${selectedId}\n${values[0]}\nТолщина: ${values[1]}мм`,
+                question: (values) => `Обновить кромку:\nid=${selectedId}\n${values[0]}\nТолщина: ${values[1]}мм\nКод: ${values[2]}`,
                 onAction: async (values) => {
                     const name = values[0] as string 
                     const thickness = values[1] as number 
-                    const result = await updateModuleEdge({ id: selectedId, name, thickness })
+                    const code1c = values[2] as string 
+                    const result = await updateModuleEdge({ id: selectedId, name, thickness, code1c })
                     if(result.success) loadData()
                     return result
                 }
@@ -53,11 +55,12 @@ export default function EditModuleEdges() {
                 }
             } : undefined}
             onAdd={perm?.Create ? {
-                question: (values) => `Добавить кромку:\n${values[0]}\nТолщина: ${values[1]}мм`,
+                question: (values) => `Добавить кромку:\n${values[0]}\nТолщина: ${values[1]}мм\nКод: ${values[2]}`,
                 onAction: async (values) => {
                     const name = values[0] as string
                     const thickness = values[1] as number
-                    const result = await addModuleEdge({ name, thickness })
+                    const code1c = values[2] as string 
+                    const result = await addModuleEdge({ name, thickness, code1c })
                     if(result.success) loadData()
                     return result
                 }

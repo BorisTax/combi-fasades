@@ -286,6 +286,7 @@ async function loginUser(user: User): Promise<Result<UserLoginResult>> {
 export async function hasPermission(req: MyRequest, resource: RESOURCE, permissions: PERMISSION[]): Promise<boolean> {
   const roles = req.roles as number[];
   let ok = false; 
+  if(!roles?.length) return false
   for (let role of roles) {
     const { read: Read, create: Create, update: Update, delete: Delete } = (await getPermissions(role, resource)).data[0] || { read: 0, create: 0, update: 0, delete: 0 }
     ok = ok || permissions.every(p => {

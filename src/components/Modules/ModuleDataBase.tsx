@@ -4,7 +4,7 @@ import EditModules from "./EditModules"
 import EditModulesCorrespond from "./EditModulesCorrespond"
 import EditModuleEdges from "./EditModuleEdges"
 import EditModuleIdName from "./EditModuleIdName"
-import { MODULE_COMMENTS_ROUTE, MODULE_GROOVES_ROUTE, MODULE_GROUPS_ROUTE } from "../../types/routes"
+import { MODULEPROJ_COMMENTS_ROUTE, MODULEPROJ_GROOVES_ROUTE, MODULEPROJ_GROUPS_ROUTE } from "../../types/routes"
 import EditModuleDetails from "./EditModuleDetails"
 import EditModuleMatBases from "./EditModuleMatBases"
 import EditModuleMatColors from "./EditModuleMatColors"
@@ -57,7 +57,7 @@ export default function ModuleDataBase() {
 
 function getTab(tab: ModulesTabs) {
     const tabs =new Map()
-    tabs.set(ModulesTabs.GROUPS, <EditModuleIdName route={MODULE_GROUPS_ROUTE}/>)
+    tabs.set(ModulesTabs.GROUPS, <EditModuleIdName route={MODULEPROJ_GROUPS_ROUTE}/>)
     tabs.set(ModulesTabs.SERIES, <EditModuleSeries />)
     tabs.set(ModulesTabs.MODULES, <EditModules />)
     tabs.set(ModulesTabs.DETAILS, <EditModuleDetails />)
@@ -69,7 +69,7 @@ function getTab(tab: ModulesTabs) {
     tabs.set(ModulesTabs.SERIE_MATERIALS, <EditModulesSerieMaterials />)
     tabs.set(ModulesTabs.MATERIALS_CORRESPOND, <EditModuleMaterialCorrespond />)
     tabs.set(ModulesTabs.EDGES, <EditModuleEdges />)
-    tabs.set(ModulesTabs.GROOVES, <EditModuleIdName route={MODULE_GROOVES_ROUTE}/>)
-    tabs.set(ModulesTabs.COMMENTS, <EditModuleIdName route={MODULE_COMMENTS_ROUTE} />)
+    tabs.set(ModulesTabs.GROOVES, <EditModuleIdName route={MODULEPROJ_GROOVES_ROUTE}/>)
+    tabs.set(ModulesTabs.COMMENTS, <EditModuleIdName route={MODULEPROJ_COMMENTS_ROUTE} />)
     return tabs.get(tab) || <></>
 }

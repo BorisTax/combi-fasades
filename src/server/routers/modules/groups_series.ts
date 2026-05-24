@@ -1,14 +1,15 @@
-import { MODULE_GROUPS_ROUTE, MODULE_SERIES_ROUTE } from "../../../types/routes";
+import { MODULEPROJ_GROUPS_ROUTE, MODULEPROJ_SERIES_ROUTE } from "../../../types/routes";
 import { MODULE_TABLE_NAMES, ModuleGroupsTableSchema, ModuleSeriesTableSchema } from "../../../types/schemas/moduleSchemas"
 import { getDataBaseModuleService } from "../../options"
 import express from "express";
 import { hasPermission } from "../users";
-import { MyRequest } from "../../../types/server";
+import { API_KEYS, MyRequest } from "../../../types/server";
 import { PERMISSION, RESOURCE } from "../../../types/user";
 import { accessDenied } from "../../functions/database";
 import messages from "../../messages";
 import { OmitId } from "../../../types/materials";
 import { group } from "console";
+import { getApiKey } from "../settings";
 
 const router = express.Router();
 export default router
@@ -60,31 +61,33 @@ export async function updateModuleSerie(data: ModuleSeriesTableSchema) {
 }
 
 
-router.get(MODULE_GROUPS_ROUTE, async (req, res) => {
-  if (!(await hasPermission(req as MyRequest, RESOURCE.MODULES, [PERMISSION.READ]))) return accessDenied(res)
-  const result = await getModuleGroups();
-  if (!result.success) return res.sendStatus(result.status)
-  res.status(result.status).json(result);
+router.get(MODULEPROJ_GROUPS_ROUTE, async (req, res) => {
+    if ((req as MyRequest).apiKey !== await getApiKey(API_KEYS.MODULEPROJECT)) {
+        if (!(await hasPermission(req as MyRequest, RESOURCE.MODULEPROJECT, [PERMISSION.READ]))) return accessDenied(res)
+    }
+    const result = await getModuleGroups();
+    if (!result.success) return res.sendStatus(result.status)
+    res.status(result.status).json(result);
 });
 
-router.post(MODULE_GROUPS_ROUTE, async (req, res) => {
-    if (!(await hasPermission(req as MyRequest, RESOURCE.MODULES, [PERMISSION.CREATE]))) return accessDenied(res)
+router.post(MODULEPROJ_GROUPS_ROUTE, async (req, res) => {
+    if (!(await hasPermission(req as MyRequest, RESOURCE.MODULEPROJECT, [PERMISSION.CREATE]))) return accessDenied(res)
     const { name} = req.body
     const result = await addModuleGroup({ name });
     result.message = (result.success && messages.DATA_ADDED) || result.message
     res.status(result.status).json(result)
 });
 
-router.put(MODULE_GROUPS_ROUTE, async (req, res) => {
-  if (!(await hasPermission(req as MyRequest, RESOURCE.MODULES, [PERMISSION.UPDATE]))) return accessDenied(res)
+router.put(MODULEPROJ_GROUPS_ROUTE, async (req, res) => {
+  if (!(await hasPermission(req as MyRequest, RESOURCE.MODULEPROJECT, [PERMISSION.UPDATE]))) return accessDenied(res)
   const { id, name } = req.body
   const result = await updateModuleGroup({id, name});
   result.message = (result.success && messages.DATA_UPDATED) || result.message
   res.status(result.status).json(result)
 });
 
-router.delete(MODULE_GROUPS_ROUTE, async (req, res) => {
-  if (!(await hasPermission(req as MyRequest, RESOURCE.MODULES, [PERMISSION.DELETE]))) return accessDenied(res)
+router.delete(MODULEPROJ_GROUPS_ROUTE, async (req, res) => {
+  if (!(await hasPermission(req as MyRequest, RESOURCE.MODULEPROJECT, [PERMISSION.DELETE]))) return accessDenied(res)
   const { id } = req.body
   const result = await removeModuleGroup(id);
   result.message = result.message
@@ -92,32 +95,34 @@ router.delete(MODULE_GROUPS_ROUTE, async (req, res) => {
 });
 
 
-router.get(MODULE_SERIES_ROUTE, async (req, res) => {
-    if (!(await hasPermission(req as MyRequest, RESOURCE.MODULES, [PERMISSION.READ]))) return accessDenied(res)
+router.get(MODULEPROJ_SERIES_ROUTE, async (req, res) => {
+    if ((req as MyRequest).apiKey !== await getApiKey(API_KEYS.MODULEPROJECT)) {
+        if (!(await hasPermission(req as MyRequest, RESOURCE.MODULEPROJECT, [PERMISSION.READ]))) return accessDenied(res)
+    }
     const { groupId } = req.query
     const result = await getModuleSeriesByGroup(+(groupId || 0));
     if (!result.success) return res.sendStatus(result.status)
     res.status(result.status).json(result);
 });
 
-router.post(MODULE_SERIES_ROUTE, async (req, res) => {
-    if (!(await hasPermission(req as MyRequest, RESOURCE.MODULES, [PERMISSION.CREATE]))) return accessDenied(res)
+router.post(MODULEPROJ_SERIES_ROUTE, async (req, res) => {
+    if (!(await hasPermission(req as MyRequest, RESOURCE.MODULEPROJECT, [PERMISSION.CREATE]))) return accessDenied(res)
     const { name, groupId} = req.body
     const result = await addModuleSerie({ name, groupId });
     result.message = (result.success && messages.DATA_ADDED) || result.message
     res.status(result.status).json(result)
 });
 
-router.put(MODULE_SERIES_ROUTE, async (req, res) => {
-  if (!(await hasPermission(req as MyRequest, RESOURCE.MODULES, [PERMISSION.UPDATE]))) return accessDenied(res)
+router.put(MODULEPROJ_SERIES_ROUTE, async (req, res) => {
+  if (!(await hasPermission(req as MyRequest, RESOURCE.MODULEPROJECT, [PERMISSION.UPDATE]))) return accessDenied(res)
   const { id, name, groupId } = req.body
   const result = await updateModuleSerie({id, name, groupId});
   result.message = (result.success && messages.DATA_UPDATED) || result.message
   res.status(result.status).json(result)
 });
 
-router.delete(MODULE_SERIES_ROUTE, async (req, res) => {
-  if (!(await hasPermission(req as MyRequest, RESOURCE.MODULES, [PERMISSION.DELETE]))) return accessDenied(res)
+router.delete(MODULEPROJ_SERIES_ROUTE, async (req, res) => {
+  if (!(await hasPermission(req as MyRequest, RESOURCE.MODULEPROJECT, [PERMISSION.DELETE]))) return accessDenied(res)
   const { id } = req.body
   const result = await removeModuleSerie(id);
   result.message = result.message

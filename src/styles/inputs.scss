@@ -1,5 +1,7 @@
 @import "./vars.scss";
-
+input, select {
+    width: max-content;
+}
 .textbox{
     color: black;
 }

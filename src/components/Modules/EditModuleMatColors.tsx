@@ -12,14 +12,14 @@ import { addModuleMatColor, deleteModuleMatColor, loadModuleMatColors, updateMod
 
 export default function EditModuleMatColors() {
     const { permissions } = useAtomValue(userAtom)
-    const perm = permissions.get(RESOURCE.MODULES)
+    const perm = permissions.get(RESOURCE.MODULEPROJECT)
     const [data, setData] = useState<ExtMap<ModuleColorsTableSchema>>(new Map())
     const dataList = [...data.keys()].filter(id => id !== 0)
     const [selectedId, setSelectedId] = useState(0)
-    const heads = [{ caption: 'id' }, { caption: 'Наименование' }, { caption: 'Код 1С' },{ caption: 'Текстура' },]
+    const heads = [{ caption: 'id', sorted: true }, { caption: 'Наименование', sorted: true }, { caption: 'Код 1С' },{ caption: 'Текстура' },]
     const contents: TableDataRow[] = dataList.map(id => ({ key: id, data: [id, data.get(id)?.name, data.get(id)?.code, data.get(id)?.texture ? "ДА" : "НЕТ"] }))
     const editItems: EditDataItem[] = [
-        { title: "Наименование:", value: data.get(selectedId)?.name || "", inputType: InputType.TEXT, checkValue: (value) => ({ success: (value as string).trim() !== "", message: "Введите наименование" }) },
+        { title: "Наименование:", value: data.get(selectedId)?.name || "", inputType: InputType.TEXT, checkValue: (value) => ({ success: (value as string).trim() !== "", message: "Введите наименование" }), styles:{minWidth: "300px"} },
         { title: "Код 1С:", value: data.get(selectedId)?.code || "", inputType: InputType.TEXT, checkValue: (value) => ({ success: (value as string).trim() !== "", message: "Введите Код 1С" }) },
         { title: "Текстура:", value: !!data.get(selectedId)?.texture, inputType: InputType.CHECKBOX },
     ]

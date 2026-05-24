@@ -12,7 +12,7 @@ import { addModuleMatBase, deleteModuleMatBase, loadModuleMatBases, updateModule
 
 export default function EditModuleMatBases() {
     const { permissions } = useAtomValue(userAtom)
-    const perm = permissions.get(RESOURCE.MODULES)
+    const perm = permissions.get(RESOURCE.MODULEPROJECT)
     const [data, setData] = useState<ExtMap<ModuleMatBaseTableSchema>>(new Map())
     const dataList = [...data.keys()].filter(id => id !== 0)
     const [selectedId, setSelectedId] = useState(0)

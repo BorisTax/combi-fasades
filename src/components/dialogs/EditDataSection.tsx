@@ -8,6 +8,17 @@ import { rusMessages } from "../../functions/messages"
 import CheckBox from "../inputs/CheckBox"
 import { MAX_FILE_SIZE } from "../../options"
 export type ValueType = string | boolean | number
+type EditDataItemList = {
+    inputType: InputType.LIST
+    list: ValueType[]
+    listWithEmptyRow?: boolean
+}
+type EditDataItemText = {
+    inputType: InputType.TEXT
+    propertyType?: PropertyType
+    maxLength?: number
+}
+
 export type EditDataItem = {
     title: string
     value: ValueType
@@ -16,16 +27,11 @@ export type EditDataItem = {
     readonly?: boolean
     optional?: boolean
     nullValue?: ValueType
-    propertyType?: PropertyType
     checkValue?: (value: ValueType) => { success: boolean, message: string }
     onChange?: (value: ValueType) => void
     styles?: object,
-} & ({
-    inputType: InputType.LIST
-    list: ValueType[]
-    listWithEmptyRow?: boolean
-} | {
-    inputType: Exclude<InputType, InputType.LIST>
+} & (EditDataItemList | EditDataItemText | {
+    inputType: Exclude<InputType, InputType.LIST | InputType.TEXT>
 })
 
 type UpdateAction = (values: (ValueType)[]) => Promise<{ success: boolean, message: string }>
@@ -66,7 +72,7 @@ export default function EditDataSection(props: EditDataSectionProps) {
             <div className="edit-section-grid">
                 {props.items.map((i, index) => <Fragment key={i.title}><span className="text-end text-nowrap">{i.title}</span>
                     {i.inputType === InputType.CHECKBOX && <CheckBox checked={newValues[index] as boolean} disabled={i.readonly} onChange={() => { setNewValues(prev => { const p = [...prev]; p[index] = !p[index]; i.onChange && i.onChange(prev[index]); return [...p] }) }} styles={i.styles} />}
-                    {i.inputType === InputType.TEXT && <TextBox value={newValues[index] as string} disabled={i.readonly} type={i.propertyType || PropertyType.STRING} setValue={(value) => { setNewValues(prev => { const p = [...prev]; p[index] = value;; i.onChange && i.onChange(p[index]); return [...p] }) }} submitOnLostFocus={true} nullValue={i.nullValue} styles={i.styles} />}
+                    {i.inputType === InputType.TEXT && <TextBox value={newValues[index] as string} disabled={i.readonly} type={i.propertyType || PropertyType.STRING} setValue={(value) => { setNewValues(prev => { const p = [...prev]; p[index] = value;; i.onChange && i.onChange(p[index]); return [...p] }) }} submitOnLostFocus={true} nullValue={i.nullValue} styles={i.styles} maxLength={i.maxLength}/>}
                     {(i.inputType === InputType.LIST) && <ComboBox<ValueType> value={newValues[index] as ValueType} items={i.list as ValueType[]} displayValue={value => i.displayValue ? i.displayValue(value) : `${value}`} disabled={i.readonly} withEmpty={i.listWithEmptyRow} onChange={value => { setNewValues(prev => { const p = [...prev]; p[index] = value as string; return [...p] }); i.onChange && i.onChange(value) }}  styles={i.styles} />}
                     {i.inputType === InputType.FILE && <div>
                         <input style={{ display: "none" }} disabled={i.readonly} type="file" ref={imageRef} accept="image/jpg, image/png, image/jpeg" src={newValues[index] as string} onChange={(e) => {
@@ -88,7 +94,7 @@ export default function EditDataSection(props: EditDataSectionProps) {
             <div className="editmaterial-buttons-container">
                 {props.onAdd && < input type="button" disabled={(props.onAdd as ActionProp).disabled} value={(props.onAdd as ActionProp)?.caption || "Добавить"} onClick={async () => {
                     if (!props.onAdd) return
-                    const values = props.items.map((p, i) => p.displayValue ? p.displayValue(newValues[i]) : newValues[i])
+                    const values = props.items.map((p, i) => p.displayValue ? p.displayValue?.(newValues[i]) as ValueType : newValues[i])
                     const check = checkFields({ items: props.items, newValues })
                     if (!check.success) { showMessage(rusMessages[check.message] || check.message); return }
                     const question = (props.onAdd as ActionProp).question && ((props.onAdd as ActionProp).question as Function)(values)
@@ -103,7 +109,7 @@ export default function EditDataSection(props: EditDataSectionProps) {
                 }} />}
                 {props.onUpdate && < input type="button" disabled={(props.onUpdate as ActionProp).disabled}  value={(props.onUpdate as ActionProp)?.caption ||"Обновить"} onClick={ async () => {
                     if (!props.onUpdate) return
-                    const values = props.items.map((p, i) => p.displayValue ? p.displayValue(newValues[i]) : newValues[i])
+                    const values = props.items.map((p, i) => p.displayValue ? p.displayValue?.(newValues[i]) as ValueType : newValues[i])
                     const check = checkFields({ items: props.items, newValues })
                     if (!check.success) { showMessage(rusMessages[check.message] || check.message); return }
                     const question = (props.onUpdate as ActionProp).question && ((props.onUpdate as ActionProp).question as Function)(values)
@@ -118,7 +124,7 @@ export default function EditDataSection(props: EditDataSectionProps) {
                 }} />}
                 {props.onDelete && <input type="button" disabled={(props.onDelete as ActionProp).disabled} value={(props.onDelete as ActionProp)?.caption ||"Удалить"} onClick={async () => {
                     if (!props.onDelete) return
-                    const values = props.items.map((p, i) => p.displayValue ? p.displayValue(newValues[i]) : newValues[i])
+                    const values = props.items.map((p, i) => p.displayValue ? p.displayValue?.(newValues[i]) as ValueType: newValues[i])
                     const question = (props.onDelete as ActionProp).question && ((props.onDelete as ActionProp).question as Function)(values)
                     const message = question || getDeleteMessage(props.name as string)
                     const conf = props.dontAsk || await showConfirm(message)

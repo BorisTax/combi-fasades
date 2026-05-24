@@ -68,7 +68,7 @@ function App() {
               {user.permissions.get(RESOURCE.WARDROBES)?.Read ? <Route path="/calculator" element={<WardrobeCalculator />} /> : <></>}
               {user.permissions.get(RESOURCE.SKLAD_STOL)?.Read ? <Route path="/sklad_stol" element={<SkladStol />} /> : <></>}
               {user.permissions.get(RESOURCE.SKLAD_MAT)?.Read ? <Route path="/sklad_mat" element={<SkladMat />} /> : <></>}
-              {user.permissions.get(RESOURCE.MODULES)?.Read ? <Route path="/modules_data_base" element={<ModuleDataBase />} /> : <></>}
+              {user.permissions.get(RESOURCE.MODULEPROJECT)?.Read ? <Route path="/modules_data_base" element={<ModuleDataBase />} /> : <></>}
               {user.permissions.get(RESOURCE.MATERIALS_DB)?.Read ? <Route path="/materials" element={<EditMaterialDialog />} /> : <></>}
               {user.permissions.get(RESOURCE.USERS)?.Read ? <Route path="/users" element={<UserDataBase />} /> : <></>}
               {user.permissions.get(RESOURCE.SETTINGS)?.Read ? <Route path="/settings" element={<Settings />} /> : <></>}

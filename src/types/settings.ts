@@ -7,3 +7,9 @@ export type SettingsThemeSchema = {
     name: string,
     in_use: boolean
 }
+
+export type ApiKeySchema = {
+    id: number
+    resource: string
+    key: string
+}

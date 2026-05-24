@@ -40,6 +40,7 @@ export enum USER_TABLE_NAMES {
 
 export enum SETTINGS_TABLE_NAMES {
     THEMES = 'themes',
+    API_KEYS = 'apikeys'
 }
 
 

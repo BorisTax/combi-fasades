@@ -3,14 +3,14 @@ import { API_ROUTE } from "../../types/routes";
 import { makeDefaultMap } from "../storage";
 import messages from "../../server/messages";
 import { ModuleGroupsTableSchema } from "../../types/schemas/moduleSchemas";
-import { MODULE_ROUTE } from "../../types/routes";
+import { MODULEPROJ_ROUTE } from "../../types/routes";
 import { DefaultSchema } from "../../types/schemas/schemas";
 import { IdNameRoutes } from "../../components/Modules/EditModuleIdName";
 
 
 export async function loadModuleIdNameData(route: IdNameRoutes){
     try {
-        const fetchData: FetchResult<DefaultSchema> = await fetchGetData(`${API_ROUTE}${MODULE_ROUTE}${route}`)
+        const fetchData: FetchResult<DefaultSchema> = await fetchGetData(`${API_ROUTE}${MODULEPROJ_ROUTE}${route}`)
         const data = fetchData.data.filter(d => d.id !== 0)
         return makeDefaultMap(data)
     } catch (e) {
@@ -21,7 +21,7 @@ export async function loadModuleIdNameData(route: IdNameRoutes){
 
 export async function addModuleIdNameData(route: IdNameRoutes, name: string){
     try {
-        const result = await fetchData(`${API_ROUTE}${MODULE_ROUTE}${route}`, "POST", JSON.stringify({ name }))
+        const result = await fetchData(`${API_ROUTE}${MODULEPROJ_ROUTE}${route}`, "POST", JSON.stringify({ name }))
         return { success: result.success as boolean, message: result.message as string }
     } catch (e) {
          console.error(e) 
@@ -31,7 +31,7 @@ export async function addModuleIdNameData(route: IdNameRoutes, name: string){
 
 export async function updateModuleIdNameData(route: IdNameRoutes, data: ModuleGroupsTableSchema){
     try {
-        const result = await fetchData(`${API_ROUTE}${MODULE_ROUTE}${route}`, "PUT", JSON.stringify({ ...data }))
+        const result = await fetchData(`${API_ROUTE}${MODULEPROJ_ROUTE}${route}`, "PUT", JSON.stringify({ ...data }))
         return { success: result.success as boolean, message: result.message as string }
     } catch (e) {
          console.error(e) 
@@ -41,7 +41,7 @@ export async function updateModuleIdNameData(route: IdNameRoutes, data: ModuleGr
 
 export async function deleteModuleModuleIdNameData(route: IdNameRoutes, id: number) {
     try {
-        const result = await fetchData(`${API_ROUTE}${MODULE_ROUTE}${route}`, "DELETE", JSON.stringify({ id }))
+        const result = await fetchData(`${API_ROUTE}${MODULEPROJ_ROUTE}${route}`, "DELETE", JSON.stringify({ id }))
         return { success: result.success as boolean, message: result.message as string }
     } catch (e) {
          console.error(e) 

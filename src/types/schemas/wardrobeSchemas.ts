@@ -1,5 +1,5 @@
 import { CHAR_TYPE, CHAR_PURPOSE } from "../enums";
-import { SettingsThemeSchema } from "../themes";
+import { SettingsThemeSchema } from "../settings";
 import { KROMKA_TYPE } from "../wardrobe";
 import { IdToCharIdSchema, DefaultSchema } from "./schemas";
 
@@ -145,9 +145,6 @@ export type AllData = {
     detailNames: DetailSchema[]
     wardrobesDimensions: WardrobesDimensionsSchema[]
     wardrobesFasadCount: WardrobesFasadCountSchema[]
-    settings: {
-        themes: SettingsThemeSchema[]
-    }
 }
 
 export enum DATA_TABLE_NAMES {

@@ -1,9 +1,9 @@
 import { FetchResult, fetchData, fetchGetData } from "../../functions/fetch";
-import { API_ROUTE, MODULE_MODULES_ROUTE } from "../../types/routes";
+import { API_ROUTE, MODULEPROJ_MODULES_ROUTE } from "../../types/routes";
 import { makeExtMap } from "../storage";
 import messages from "../../server/messages";
 import { ModuleModulesTableSchema } from "../../types/schemas/moduleSchemas";
-import { MODULE_ROUTE } from "../../types/routes";
+import { MODULEPROJ_ROUTE } from "../../types/routes";
 import { OmitId } from "../../types/materials";
 import { atom } from "jotai";
 
@@ -11,7 +11,7 @@ export const modulesLastStateDBAtom = atom<{ groupId: number, serieId: number, m
 
 export const loadModules =  async (serieId: number) => {
     try {
-        const fetchData: FetchResult<ModuleModulesTableSchema> = await fetchGetData(`${API_ROUTE}${MODULE_ROUTE}${MODULE_MODULES_ROUTE}?serieId=${serieId}`)
+        const fetchData: FetchResult<ModuleModulesTableSchema> = await fetchGetData(`${API_ROUTE}${MODULEPROJ_ROUTE}${MODULEPROJ_MODULES_ROUTE}?serieId=${serieId}`)
         const data = fetchData.data.filter(d => d.id !== 0)
         return makeExtMap(data)
     } catch (e) { 
@@ -23,7 +23,7 @@ export const loadModules =  async (serieId: number) => {
 
 export const addModule = async (data: OmitId<ModuleModulesTableSchema>) => {
     try {
-        const result = await fetchData(`${API_ROUTE}${MODULE_ROUTE}${MODULE_MODULES_ROUTE}`, "POST", JSON.stringify({ ...data }))
+        const result = await fetchData(`${API_ROUTE}${MODULEPROJ_ROUTE}${MODULEPROJ_MODULES_ROUTE}`, "POST", JSON.stringify({ ...data }))
         return { success: result.success as boolean, message: result.message as string }
     } catch (e) {
          console.error(e) 
@@ -33,7 +33,7 @@ export const addModule = async (data: OmitId<ModuleModulesTableSchema>) => {
 
 export const updateModule = async (data: ModuleModulesTableSchema) => {
     try {
-        const result = await fetchData(`${API_ROUTE}${MODULE_ROUTE}${MODULE_MODULES_ROUTE}`, "PUT", JSON.stringify({ ...data }))
+        const result = await fetchData(`${API_ROUTE}${MODULEPROJ_ROUTE}${MODULEPROJ_MODULES_ROUTE}`, "PUT", JSON.stringify({ ...data }))
         return { success: result.success as boolean, message: result.message as string }
     } catch (e) {
          console.error(e) 
@@ -43,7 +43,7 @@ export const updateModule = async (data: ModuleModulesTableSchema) => {
 
 export const deleteModule = async (id: number) => {
     try {
-        const result = await fetchData(`${API_ROUTE}${MODULE_ROUTE}${MODULE_MODULES_ROUTE}`, "DELETE", JSON.stringify({ id }))
+        const result = await fetchData(`${API_ROUTE}${MODULEPROJ_ROUTE}${MODULEPROJ_MODULES_ROUTE}`, "DELETE", JSON.stringify({ id }))
         return { success: result.success as boolean, message: result.message as string }
     } catch (e) {
          console.error(e) 

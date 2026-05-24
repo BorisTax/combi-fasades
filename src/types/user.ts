@@ -14,7 +14,7 @@ export enum RESOURCE {
     MATERIALS_DB = 11,
     SKLAD_STOL = 12,
     SKLAD_MAT = 13,
-    MODULES = 14,
+    MODULEPROJECT = 14,
     SKLAD_DB_EDIT = 20,
     SETTINGS = 100
 }

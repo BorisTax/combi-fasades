@@ -1,8 +1,8 @@
 import { FetchResult, fetchData, fetchGetData } from "../../functions/fetch";
-import { API_ROUTE, MODULE_MATERIAL_CORRESPOND_ROUTE } from "../../types/routes";
+import { API_ROUTE, MODULEPROJ_MATERIAL_CORRESPOND_ROUTE } from "../../types/routes";
 import messages from "../../server/messages";
 import { ModuleMaterialCorrespondTableSchema } from "../../types/schemas/moduleSchemas";
-import { MODULE_ROUTE } from "../../types/routes";
+import { MODULEPROJ_ROUTE } from "../../types/routes";
 import { OmitId } from "../../types/materials";
 import { makeExtMap } from "../storage";
 
@@ -10,7 +10,7 @@ import { makeExtMap } from "../storage";
 
 export const loadModuleMaterialCorrespond = async () => {
     try {
-        const fetchData: FetchResult<ModuleMaterialCorrespondTableSchema> = await fetchGetData(`${API_ROUTE}${MODULE_ROUTE}${MODULE_MATERIAL_CORRESPOND_ROUTE}`)
+        const fetchData: FetchResult<ModuleMaterialCorrespondTableSchema> = await fetchGetData(`${API_ROUTE}${MODULEPROJ_ROUTE}${MODULEPROJ_MATERIAL_CORRESPOND_ROUTE}`)
         const data = fetchData.data
         return makeExtMap(data)
     } catch (e) { 
@@ -21,7 +21,7 @@ export const loadModuleMaterialCorrespond = async () => {
 
 export const addModuleMaterialCorrespond = async (data: OmitId<ModuleMaterialCorrespondTableSchema>) => {
     try {
-        const result = await fetchData(`${API_ROUTE}${MODULE_ROUTE}${MODULE_MATERIAL_CORRESPOND_ROUTE}`, "POST", JSON.stringify({ ...data }))
+        const result = await fetchData(`${API_ROUTE}${MODULEPROJ_ROUTE}${MODULEPROJ_MATERIAL_CORRESPOND_ROUTE}`, "POST", JSON.stringify({ ...data }))
         return { success: result.success as boolean, message: result.message as string }
     } catch (e) {
          console.error(e) 
@@ -31,7 +31,7 @@ export const addModuleMaterialCorrespond = async (data: OmitId<ModuleMaterialCor
 
 export const updateModuleMaterialCorrespond = async (data: ModuleMaterialCorrespondTableSchema) => {
     try {
-        const result = await fetchData(`${API_ROUTE}${MODULE_ROUTE}${MODULE_MATERIAL_CORRESPOND_ROUTE}`, "PUT", JSON.stringify({ ...data }))
+        const result = await fetchData(`${API_ROUTE}${MODULEPROJ_ROUTE}${MODULEPROJ_MATERIAL_CORRESPOND_ROUTE}`, "PUT", JSON.stringify({ ...data }))
         return { success: result.success as boolean, message: result.message as string }
     } catch (e) {
          console.error(e) 
@@ -41,7 +41,7 @@ export const updateModuleMaterialCorrespond = async (data: ModuleMaterialCorresp
 
 export const deleteModuleMaterialCorrespond = async (id: number) => {
     try {
-        const result = await fetchData(`${API_ROUTE}${MODULE_ROUTE}${MODULE_MATERIAL_CORRESPOND_ROUTE}`, "DELETE", JSON.stringify({ id }))
+        const result = await fetchData(`${API_ROUTE}${MODULEPROJ_ROUTE}${MODULEPROJ_MATERIAL_CORRESPOND_ROUTE}`, "DELETE", JSON.stringify({ id }))
         return { success: result.success as boolean, message: result.message as string }
     } catch (e) {
          console.error(e) 

@@ -1,13 +1,14 @@
-import { MODULE_DETAILS_ROUTE } from "../../../types/routes";
+import { MODULEPROJ_DETAILS_ROUTE } from "../../../types/routes";
 import { MODULE_TABLE_NAMES, ModuleDetailsTableSchema } from "../../../types/schemas/moduleSchemas"
 import { getDataBaseModuleService } from "../../options"
 import express from "express";
 import { hasPermission } from "../users";
-import { MyRequest } from "../../../types/server";
+import { API_KEYS, MyRequest } from "../../../types/server";
 import { PERMISSION, RESOURCE } from "../../../types/user";
 import { accessDenied } from "../../functions/database";
 import messages from "../../messages";
 import { OmitId } from "../../../types/materials";
+import { getApiKey } from "../settings";
 
 const router = express.Router();
 export default router
@@ -20,7 +21,7 @@ export async function getDetailsByModule(moduleId: number | undefined) {
 
 export async function getModuleDetails() {
     const service = getDataBaseModuleService<ModuleDetailsTableSchema>()
-    return await service.getData(MODULE_TABLE_NAMES.DETAILS, ["id", "name", "moduleId", "matIndex", "count", "length", "width", "grooveId", "commentId", "el1", "el2", "ew1", "ew2", "texture"], {})
+    return await service.getData(MODULE_TABLE_NAMES.DETAILS, [], {})
 }
 
 export async function addModuleDetail(data: OmitId<ModuleDetailsTableSchema>) {
@@ -39,32 +40,34 @@ export async function updateModuleDetail(data: ModuleDetailsTableSchema) {
 }
 
 
-router.get(MODULE_DETAILS_ROUTE, async (req, res) => {
-    if (!(await hasPermission(req as MyRequest, RESOURCE.MODULES, [PERMISSION.READ]))) return accessDenied(res)
+router.get(MODULEPROJ_DETAILS_ROUTE, async (req, res) => {
+    if ((req as MyRequest).apiKey !== await getApiKey(API_KEYS.MODULEPROJECT)) {
+        if (!(await hasPermission(req as MyRequest, RESOURCE.MODULEPROJECT, [PERMISSION.READ]))) return accessDenied(res)
+    }
     const { moduleId } = req.query
     const result = await getDetailsByModule(+(moduleId || 0));
     if (!result.success) return res.sendStatus(result.status)
     res.status(result.status).json(result);
 });
 
-router.post(MODULE_DETAILS_ROUTE, async (req, res) => {
-    if (!(await hasPermission(req as MyRequest, RESOURCE.MODULES, [PERMISSION.CREATE]))) return accessDenied(res)
-    const { name, moduleId, matIndex, length, width, count, grooveId, commentId, el1, el2, ew1, ew2, texture } = req.body as ModuleDetailsTableSchema
-    const result = await addModuleDetail({ name, moduleId, matIndex, length, width, count, grooveId, commentId, el1, el2, ew1, ew2, texture });
+router.post(MODULEPROJ_DETAILS_ROUTE, async (req, res) => {
+    if (!(await hasPermission(req as MyRequest, RESOURCE.MODULEPROJECT, [PERMISSION.CREATE]))) return accessDenied(res)
+    const { name, moduleId, matIndex, length, width, count, grooveId, commentId, el1, el2, ew1, ew2, texture, drill } = req.body as ModuleDetailsTableSchema
+    const result = await addModuleDetail({ name, moduleId, matIndex, length, width, count, grooveId, commentId, el1, el2, ew1, ew2, texture, drill });
     result.message = (result.success && messages.DATA_ADDED) || result.message
     res.status(result.status).json(result)
 });
 
-router.put(MODULE_DETAILS_ROUTE, async (req, res) => {
-    if (!(await hasPermission(req as MyRequest, RESOURCE.MODULES, [PERMISSION.UPDATE]))) return accessDenied(res)
-    const { id, name, moduleId, matIndex, length, width, count, grooveId, commentId, el1, el2, ew1, ew2, texture} = req.body as ModuleDetailsTableSchema
-    const result = await updateModuleDetail({ id, name, moduleId, matIndex, length, width, count, grooveId, commentId, el1, el2, ew1, ew2, texture });
+router.put(MODULEPROJ_DETAILS_ROUTE, async (req, res) => {
+    if (!(await hasPermission(req as MyRequest, RESOURCE.MODULEPROJECT, [PERMISSION.UPDATE]))) return accessDenied(res)
+    const { id, name, moduleId, matIndex, length, width, count, grooveId, commentId, el1, el2, ew1, ew2, texture, drill} = req.body as ModuleDetailsTableSchema
+    const result = await updateModuleDetail({ id, name, moduleId, matIndex, length, width, count, grooveId, commentId, el1, el2, ew1, ew2, texture, drill });
     result.message = (result.success && messages.DATA_UPDATED) || result.message
     res.status(result.status).json(result)
 });
 
-router.delete(MODULE_DETAILS_ROUTE, async (req, res) => {
-  if (!(await hasPermission(req as MyRequest, RESOURCE.MODULES, [PERMISSION.DELETE]))) return accessDenied(res)
+router.delete(MODULEPROJ_DETAILS_ROUTE, async (req, res) => {
+  if (!(await hasPermission(req as MyRequest, RESOURCE.MODULEPROJECT, [PERMISSION.DELETE]))) return accessDenied(res)
   const { id } = req.body
   const result = await removeModuleDetail(id);
   result.message = result.message

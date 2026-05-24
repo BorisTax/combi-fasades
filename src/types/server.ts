@@ -10,6 +10,7 @@ export type RequestBody = {
 export interface MyRequest extends Request {
     roles: number[]
     token?: string
+    apiKey?: string
 }
 export enum TableFields {
     NAME = 'name',
@@ -38,7 +39,9 @@ export enum TableFields {
     PERMISSIONS = 'permissions'
 }
 
-
+export enum API_KEYS {
+    MODULEPROJECT = 1
+}
 
 export type PriceData = {
     name: SpecItem

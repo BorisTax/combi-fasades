@@ -16,21 +16,22 @@ import { addModuleMaterialCorrespond, deleteModuleMaterialCorrespond, loadModule
 
 export default function EditModuleMaterialCorrespond() {
     const { permissions } = useAtomValue(userAtom)
-    const perm = permissions.get(RESOURCE.MODULES)
+    const perm = permissions.get(RESOURCE.MODULEPROJECT)
     const [matBases, setMatBases] = useState<ExtMap<ModuleMatBaseTableSchema>>(new Map())
     const [selectedMatBaseId, setSelectedMatBaseId] = useState(0)
     const [materials, setMaterials] = useState<ExtMap<ModuleMaterialsTableSchema>>(new Map())
     const { getFullMaterialName } = useModuleMaterials(materials)
     const [materialCorr, setMaterialsCorr] = useState<ExtMap<ModuleMaterialCorrespondTableSchema>>(new Map())
     const matList = [...materials.keys()].filter(id => (materials.get(id)?.baseId === selectedMatBaseId || selectedMatBaseId === 0) && id !== 0)
-    const matCorrList = [...materialCorr.keys()]
+    const sortedMatList = matList.toSorted((id1, id2) => getFullMaterialName(id1) > getFullMaterialName(id2) ? 1 : -1)
+    const matCorrList = [...materialCorr.keys()].filter(id => materials.get(materialCorr.get(id)?.materialId || 0)?.baseId === selectedMatBaseId || selectedMatBaseId === 0)
     const [selectedId, setSelectedId] = useState(0)
     const { matIndex, material1C, materialId } = materialCorr.get(selectedId) || { matIndex: 0, material1C: "", materialId: 0 }
     const heads = [{ caption: 'id' }, { caption: 'Материал 1С' }, { caption: 'Материал' }, { caption: 'Индекс' }]
     const contents: TableDataRow[] = matCorrList.map(id => ({ key: id, data: [id, materialCorr.get(id)?.material1C, getFullMaterialName(materialCorr.get(id)?.materialId || 0), materialCorr.get(id)?.matIndex] }))
     const editItems: EditDataItem[] = [
-        { title: "Материал 1С:", value: material1C, inputType: InputType.TEXT, checkValue: (value) => ({ success: (value as string).trim() !== "", message: "Введите материал 1С" }) },
-        { title: "Материал:", value: materialId, displayValue: value => getFullMaterialName(value as number), inputType: InputType.LIST, list: matList, checkValue: (value) => ({ success: (value as number) !== 0, message: "Выберите материал" }) },
+        { title: "Материал 1С:", value: material1C, inputType: InputType.TEXT, checkValue: (value) => ({ success: (value as string).trim() !== "", message: "Введите материал 1С" }), styles:{width: "100%"} },
+        { title: "Материал:", value: materialId, displayValue: value => getFullMaterialName(value as number), inputType: InputType.LIST, list: sortedMatList, checkValue: (value) => ({ success: (value as number) !== 0, message: "Выберите материал" }) },
         { title: "Индекс мат.", value: matIndex, displayValue: value => (value || "").toString(), inputType: InputType.LIST, list: MatIndexes, checkValue: (value) => ({ success: (value as number) > 0, message: "Введите индекс материала" }) },
         ]
     const loadData = () => loadModuleMaterialCorrespond().then(data => { setMaterialsCorr(data); setSelectedId([...data.keys()][0] || 0) })

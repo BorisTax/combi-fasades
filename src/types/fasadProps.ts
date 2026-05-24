@@ -1,5 +1,4 @@
 import { FASAD_TYPE } from "./enums"
-import { FasadMaterial } from "./materials"
 
 export type FasadProps = {
     width?: number

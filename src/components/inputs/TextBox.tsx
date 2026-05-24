@@ -1,31 +1,39 @@
 import { useState, useEffect } from "react"
 import { PropertyType, RegExp } from "../../types/property"
 import { ValueType } from "../dialogs/EditDataSection"
-
+type TextBoxNumberProps = {
+  type: PropertyType.INTEGER_POSITIVE_NUMBER | PropertyType.NUMBER | PropertyType.POSITIVE_NUMBER
+  max?: number
+  min?: number
+}
 export type TextBoxProps = {
     setValue: (value: string) => void
     value: ValueType
     nullValue?: ValueType
-    type: PropertyType
+    maxLength?: number
     name?: string
     disabled?: boolean
-    max?: number
-    min?: number
     submitOnLostFocus?: boolean
     width?: string
     styles?: object
-}
+} & (TextBoxNumberProps | 
+  {
+    type: Exclude<PropertyType, PropertyType.INTEGER_POSITIVE_NUMBER | PropertyType.NUMBER | PropertyType.POSITIVE_NUMBER>
+  }
+)
 
 export default function TextBox(props: TextBoxProps) {
     const [state, setState] = useState({ value: String(props.value), prevValue: String(props.value) })
+    const propsNumber = props as TextBoxNumberProps
     useEffect(() => {
       let value = props.value === undefined ? props.nullValue : props.value
+      
       if (typeof value === 'number'){
-        if (props.min && value < props.min) props.setValue(String(props.min));
-        if (props.max && value > props.max) props.setValue(String(props.max));
+        if (propsNumber.min && value < propsNumber.min) props.setValue(String(propsNumber.min));
+        if (propsNumber.max && value > propsNumber.max) props.setValue(String(propsNumber.max));
       }
         setState({ prevValue: String(value), value: String(value) })
-    }, [props.value, props.min, props.max])
+    }, [props.value, propsNumber.min, propsNumber.max])
     const onChange = (v: string) => {
         if (v === "") { setState({ ...state, value: v }); return }
         const { value, correct } = test(v, props.type)
@@ -33,7 +41,7 @@ export default function TextBox(props: TextBoxProps) {
     }
   const className = ((state.value !== state.prevValue) ? "textbox-incorrect" : "textbox")
   const submit = () => {
-    if (minMaxTest(state.value, props.max, props.min))
+    if (minMaxTest(state.value, propsNumber.max, propsNumber.min))
       props.setValue(state.value);
     else setState({ ...state, value: state.prevValue });
   }
@@ -56,6 +64,7 @@ export default function TextBox(props: TextBoxProps) {
           className={className}
           disabled={props.disabled}
           value={state.value}
+          maxLength={props.maxLength}
           name={props.name || "input"}
           onKeyDown={(e) => {
             e.stopPropagation();

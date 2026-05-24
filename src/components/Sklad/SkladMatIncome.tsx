@@ -14,10 +14,15 @@ export default function SkladMatIncome({ income }: { income: boolean }) {
     const matColors = useAtomValue(matSkladColorsAtom)
     const matThickness = useAtomValue(matSkladThickAtom)
     const matDepartment = useAtomValue(matSkladDepartAtom)
+    const getFullName = (id: number) => {
+        const mat = matColors.get(id as number)
+        return (mat?.name || "") + " " + matThickness.get(mat?.thickId || 0)
+    }
     const minDate = listFull.map(l => l.date).reduce((prev, curr) => prev > curr ? curr : prev, listFull[0]?.date)
     const {filterDepart, filterId, filterMinLength, filterMaxLength, filterMinWidth, filterMaxWidth, filterMinDate, filterMaxDate, filterThick, setFilter } = useFilter(income, minDate)
-    const list = listFull.filter(s => (s?.id === filterId || filterId === 0) && (s?.department === filterDepart || filterId === 0) && (matColors.get(s.id)?.thickId === filterThick || filterThick === 0) && s?.length >= filterMinLength && s?.length <= filterMaxLength && s?.width >= filterMinWidth && s?.width <= filterMaxWidth && s?.date >= filterMinDate && s?.date <= filterMaxDate)
-    const listDistinctId = [...new Set(listFull.map(s => s.id).filter(id => matColors.get(id)?.thickId === filterThick || filterThick === 0))]
+    const list = listFull.filter(s => (s?.id === filterId || filterId === 0) && (s?.department === filterDepart || filterDepart === 0) && (matColors.get(s.id)?.thickId === filterThick || filterThick === 0) && s?.length >= filterMinLength && s?.length <= filterMaxLength && s?.width >= filterMinWidth && s?.width <= filterMaxWidth && s?.date >= filterMinDate && s?.date <= filterMaxDate)
+    const listDistinctId = [...new Set(listFull.map(s => s.id).filter(id => matColors.get(id)?.thickId === filterThick || filterThick === 0))].toSorted((id1, id2) => (matColors.get(id1)?.name || "") > (matColors.get(id2)?.name || "") ? 1 : -1)
+    const listDistinctIdSorted = listDistinctId.toSorted((id1, id2) => getFullName(id1) > getFullName(id2) ? 1 : -1)
     const minDateValue = getDateInputValue(filterMinDate)
     const maxDateValue = getDateInputValue(filterMaxDate)
     const header: TableDataHeader[] = [{ caption: "Дата" },{ caption: "Цех" },  { caption: "Материал" }, { caption: "Толщина" }, { caption: "Длина" }, { caption: "Ширина" }, { caption: "Кол-во" }, { caption: "Пользователь" }]
@@ -34,9 +39,9 @@ export default function SkladMatIncome({ income }: { income: boolean }) {
         <GroupBox caption="Фильтр">
             <hr />
             <PropertyGrid>
-                <ComboBox title="Цех" value={filterDepart} items={[...matDepartment.keys()]} displayValue={v => matDepartment.get(v) || ""} onChange={value => setFilter(prev => ({ ...prev, filterDepart: value || 0 }))} styles={filterComboStyle} />
-                <ComboBox title="Толщина" value={filterThick} items={[...matThickness.keys()]} displayValue={v => matThickness.get(v) || ""} onChange={value => setFilter(prev => ({ ...prev, filterThick: value || 0 }))} styles={filterComboStyle} />
-                <ComboBox title="Материал" value={filterId} items={listDistinctId} displayValue={v => {
+                <ComboBox title="Цех" value={filterDepart} items={[...matDepartment.keys()]} displayValue={v => matDepartment.get(v) || ""} onChange={value => setFilter(prev => ({ ...prev, filterDepart: value || 0, filterThick: 0, filterId: 0 }))} styles={filterComboStyle} />
+                <ComboBox title="Толщина" value={filterThick} items={[...matThickness.keys()]} displayValue={v => matThickness.get(v) || ""} onChange={value => setFilter(prev => ({ ...prev, filterThick: value || 0, filterId: 0 }))} styles={filterComboStyle} />
+                <ComboBox title="Материал" value={filterId} items={listDistinctIdSorted} displayValue={v => {
                     const mat = matColors.get(v as number)
                     return (mat?.name || "") + " " + matThickness.get(mat?.thickId || 0)
                 }}
@@ -47,6 +52,12 @@ export default function SkladMatIncome({ income }: { income: boolean }) {
                 <TextBox type={PropertyType.INTEGER_POSITIVE_NUMBER} value={filterMinLength} min={0} max={10000} setValue={value => setFilter(prev => ({ ...prev, filterMinLength: +value || 0 }))} width="60px" />
                 <div>до</div>
                 <TextBox type={PropertyType.INTEGER_POSITIVE_NUMBER} value={filterMaxLength} min={0} max={10000} setValue={value => setFilter(prev => ({ ...prev, filterMaxLength: +value || 0 }))} width="60px" />
+            </div>
+            <div className="d-flex align-items-center gap-1">
+                <div>Ширина от</div>
+                <TextBox type={PropertyType.INTEGER_POSITIVE_NUMBER} value={filterMinWidth} min={0} max={10000} setValue={value => setFilter(prev => ({ ...prev, filterMinWidth: +value || 0 }))} width="60px" />
+                <div>до</div>
+                <TextBox type={PropertyType.INTEGER_POSITIVE_NUMBER} value={filterMaxWidth} min={0} max={10000} setValue={value => setFilter(prev => ({ ...prev, filterMaxWidth: +value || 0 }))} width="60px" />
             </div>
             <div className="d-flex align-items-center gap-1 justify-content-stretch">
                 <input type="date" value={minDateValue} onChange={(e) => setFilter(prev => ({ ...prev, filterMinDate: new Date(e.target.value).valueOf() }))} />

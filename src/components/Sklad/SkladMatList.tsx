@@ -32,17 +32,20 @@ export default function SkladMatList() {
     const [{ filterId, filterMinLength, filterMaxLength, filterMinWidth, filterMaxWidth, filterThick, filterDepart }, setFilter] = useState({ filterId: 0, filterMinLength: 0, filterMaxLength: 3000, filterMinWidth: 0, filterMaxWidth: 3000, filterThick: 0 , filterDepart: 0 })
     const matColorsFiltered = [...matColors.keys()].filter(m => matColors.get(m)?.thickId === filterThick || filterThick === 0).toSorted((id1, id2) => (matColors.get(id1)?.name || "") > (matColors.get(id2)?.name || "") ? 1 : -1)
     const matSklad = matSkladFull.filter(s => (s?.id === filterId || filterId === 0) && (s?.department === filterDepart || filterDepart === 0) && (matColors.get(s.id)?.thickId === filterThick || filterThick === 0) && s?.length >= filterMinLength && s?.length <= filterMaxLength && s?.width >= filterMinWidth && s?.width <= filterMaxWidth)
-    const matSkladDistinctId = [...new Set(matSkladFull.map(s => s.id).filter(id => matColors.get(id)?.thickId === filterThick || filterThick === 0))]
+    const getFullName = (id: number) => {
+        const mat = matColors.get(id as number)
+        return (mat?.name || "") + " " + matThickness.get(mat?.thickId || 0)
+    }
+    const matSkladFullName = matSklad.map(m => ({ ...m, fullName: getFullName(m.id) }))
+    const matSkladDistinctId = [...new Set(matSkladFullName.map(s => s.id).filter(id => matColors.get(id)?.thickId === filterThick || filterThick === 0))]
+    const matSkladDistinctIdSorted = matSkladDistinctId.toSorted((id1, id2) => getFullName(id1) > getFullName(id2) ? 1 : -1)
     const [selected, setSelected] = useState({row: 0})
     const heads: TableDataHeader[] = [{ caption: "Цех" }, { caption: "Материал", sorted: sortTable }, { caption: "Толщина" }, { caption: "Длина", sorted: sortTable }, { caption: "Ширина", sorted: sortTable }, { caption: "Кол-во" }]
     const contents = matSklad.map((ss, index) => ({ key: index, data: [matDepartment.get(ss.department), matColors.get(ss.id)?.name, matThickness.get(matColors.get(ss.id)?.thickId || 0), ss.length || 0, ss.width || 0, ss.count || 0] }))
     const editItems: EditDataItem[] = [
         { title: "Цех:", value: matSklad[selected.row]?.department, displayValue: (value) =>  matDepartment.get(value as number) || "",
              inputType: InputType.LIST, list: [...matDepartment.keys()], checkValue: (value) => ({ success: !!value, message: "Выберите цех" }) },
-        { title: "Материал:", value: matSklad[selected.row]?.id, displayValue: (value) => {
-            const mat = matColors.get(value as number)
-            return (mat?.name || "") + " " + matThickness.get(mat?.thickId || 0)
-        },
+        { title: "Материал:", value: matSklad[selected.row]?.id, displayValue: (value) => getFullName(value as number),
              inputType: InputType.LIST, list: matColorsFiltered, checkValue: (value) => ({ success: !!value, message: "Выберите материал" }) },
         { title: "Длина:", value: matSklad[selected.row]?.length, nullValue: 0, inputType: InputType.TEXT, propertyType: PropertyType.INTEGER_POSITIVE_NUMBER, checkValue: (value) => ({ success: value as number > 0, message: "Длина должна быть больше 0" }) },
         { title: "Ширина:", value: matSklad[selected.row]?.width, nullValue: 0, inputType: InputType.TEXT, propertyType: PropertyType.INTEGER_POSITIVE_NUMBER, checkValue: (value) => ({ success: value as number > 0, message: "Ширина должна быть больше 0" }) },
@@ -65,9 +68,9 @@ export default function SkladMatList() {
         <GroupBox caption="Фильтр">
             <hr />
             <PropertyGrid>
-                <ComboBox title="Цех" value={filterDepart} items={[...matDepartment.keys()]} displayValue={v => matDepartment.get(v) || ""} onChange={value => setFilter(prev => ({ ...prev, filterDepart: value || 0 }))} styles={filterComboStyle} />
-                <ComboBox title="Толщина" value={filterThick} items={[...matThickness.keys()]} displayValue={v => matThickness.get(v) || ""} onChange={value => setFilter(prev => ({ ...prev, filterThick: value || 0 }))} styles={filterComboStyle} />
-                <ComboBox title="Материал" value={filterId} items={matSkladDistinctId} displayValue={v => {
+                <ComboBox title="Цех" value={filterDepart} items={[...matDepartment.keys()]} displayValue={v => matDepartment.get(v) || ""} onChange={value => setFilter(prev => ({ ...prev, filterDepart: value || 0, filterId: 0, filterThick: 0 }))} styles={filterComboStyle} />
+                <ComboBox title="Толщина" value={filterThick} items={[...matThickness.keys()]} displayValue={v => matThickness.get(v) || ""} onChange={value => setFilter(prev => ({ ...prev, filterThick: value || 0, filterId: 0 }))} styles={filterComboStyle} />
+                <ComboBox title="Материал" value={filterId} items={matSkladDistinctIdSorted} displayValue={v => {
                     const mat = matColors.get(v as number)
                     return (mat?.name || "") + " " + matThickness.get(mat?.thickId || 0)
                 }}
